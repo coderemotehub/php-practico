@@ -1,0 +1,8 @@
+name,desc,price,unitCount,isAvailable,inStock
+Computadora Portátil,Laptop de alto rendimiento para juegos,1200.5,10,TRUE,8
+Mouse Inalámbrico,Mouse ergonómico y sin cables,25.75,50,TRUE,35
+Teclado Mecánico,Teclado retroiluminado con teclas mecánicas,75,30,TRUE,20
+Monitor 24 Pulgadas,"Monitor de 24 pulgadas, ideal para oficina",150,15,TRUE,15
+Impresora Láser,Impresora láser rápida y eficiente,215.9,5,TRUE,2
+Silla de Oficina,Silla ergonómica ajustable,89.99,20,FALSE,0
+Cable HDMI,Cable HDMI de 2 metros,10.2,100,TRUE,85
