@@ -1,10 +1,7 @@
 <?php
- $servname = "127.0.0.1:3306";
- $dbname = "product_manager";
- $user = "root";
- $password = "rootpass";
+    require_once "../config.php";
 
- $conn = new mysqli($servname, $user, $password, $dbname);
+    $conn = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME);
 
  if($conn->connect_error){
      die("Connection failed: " . $conn->connect_error);
