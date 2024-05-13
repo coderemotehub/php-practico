@@ -17,8 +17,9 @@
         // Open the CSV file
         if (($handle = fopen($fileName, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                $values = implode("','", array_map("escapeData", $data));
+                $values = implode("','", array_map("escapeData", $data)); // 1,Electronics -> [1,Electronics]
                 $sql = "INSERT INTO $tableName ($columns) VALUES ('$values');";
+                echo "<br>". $sql . "<br>";
                 if (!$conn->query($sql)) {
                     echo "Error importing data into $tableName: " . $conn->error . "<br>";
                 }
