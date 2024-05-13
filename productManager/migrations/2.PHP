@@ -37,10 +37,10 @@
 
     // Specify file names and corresponding table and column names
     $csvFiles = [
-        ["fileName" => "categories.csv", "tableName" => "categories", "columns" => "id, category_name"],
-        ["fileName" => "products.csv", "tableName" => "products", "columns" => "id, product_name, product_desc, product_price, category_id"],
-        ["fileName" => "invoices.csv", "tableName" => "invoices", "columns" => "id, customer_nif, total_amount"],
-        ["fileName" => "product_invoice.csv", "tableName" => "product_invoice", "columns" => "id, product_id, invoice_id, quantity"]
+        ["fileName" => "./CSV/categories.csv", "tableName" => "categories", "columns" => "id, category_name"],
+        ["fileName" => "./CSV/products.csv", "tableName" => "products", "columns" => "id, product_name, product_desc, product_price, category_id"],
+        ["fileName" => "./CSV/invoices.csv", "tableName" => "invoices", "columns" => "id, customer_nif, total_amount"],
+        ["fileName" => "./CSV/product_invoice.csv", "tableName" => "product_invoice", "columns" => "id, product_id, invoice_id, quantity"]
     ];
 
     // Import each CSV file into the corresponding table
