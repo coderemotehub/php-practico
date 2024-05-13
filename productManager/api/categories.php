@@ -33,8 +33,23 @@ switch($method){
         echo(json_encode($response));
         break;
     case 'PUT':
-        $result = ["METHOD" => "PUT", "SUCCESS" => true];
-        echo(json_encode($result));
+        $id = $_GET['id'];
+        $name = $_GET['category_name'];
+        $sql = "UPDATE categories SET category_name = '$name' WHERE id = $id";
+
+        if ($conn->query($sql) === TRUE) {
+            if($conn->affected_rows > 0){
+                $updatedRecordQuery = "SELECT * FROM categories WHERE id = $id";
+                $updatedRecord = $conn->query($updatedRecordQuery); 
+                $response = ["METHOD" => "PUT", "SUCCESS" => true, "DATA" => $updatedRecord->fetch_assoc()];
+            } else {
+                $response = ["METHOD" => "PUT", "SUCCESS" => false, "ERROR" => "Category not found"];
+            }
+        } else {
+            $response = ["METHOD" => "PUT", "SUCCESS" => false, "ERROR" => $conn->error];
+        }
+    
+        echo json_encode($response);
         break;
     case 'POST':
         $result = ["METHOD" => "POST", "SUCCESS" => true];
