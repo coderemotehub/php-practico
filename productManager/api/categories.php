@@ -62,8 +62,29 @@ switch($method){
         echo json_encode($response);
         break;
     case 'POST':
-        $result = ["METHOD" => "POST", "SUCCESS" => true];
-        echo(json_encode($result));
+        // almaceno el valor del body de mi request en una variable
+        $data = json_decode(file_get_contents('php://input'), true);
+        // obtener el valor del category_name
+        $name = $data['category_name'];
+        // construyo mi query SQL para crear la nueva categoria
+        $sql = "INSERT INTO categories (category_name) VALUES ('$name')";
+        // ejecuto el query y almaceno el resultado en una variable
+        $createResult = $conn->query($sql);
+        if($createResult === TRUE){
+            // se creo exitosamente
+            // obtengo el ID del nuevo registro (recien creado)
+            $newRecordId = $conn->insert_id;
+            // construyo un query para obtener el nuevo registro y regresarlo en mi respuesta. 
+            $getRecordQuery = "SELECT * FROM categories where id = $newRecordId";
+            // ejectuo el query y almaceno el resultado en una variable.
+            $newRecord = $conn->query($getRecordQuery);
+            // construyo mi respuesta
+            $response = ["METHOD" => "POST", "SUCCESS" => true, "DATA" => $newRecord->fetch_assoc()];
+        } else {
+            // no se creo existosamente
+            $response = ["METHOD" => "POST", "SUCCESS" => false, "ERROR" => $conn->error];
+        }
+        echo(json_encode($response));
         break;
     case 'DELETE':
         $result = ["METHOD" => "DELETE", "SUCCESS" => true];
