@@ -99,8 +99,18 @@ switch($method){
             $getRecordQuery = "SELECT * FROM $tableName where id = $newRecordId";
             // ejectuo el query y almaceno el resultado en una variable.
             $newRecord = $conn->query($getRecordQuery);
+            $nuevaFacturaEncabezado = $newRecord->fetch_assoc();
+            // CODIGO EXTRA
+            $invoiceProducts = $data['products'];
+            //coinstruir un query por cada producto haciendo un loop foreach similar al de la linea 83, con los productos.
+            // insertar esos productos en la tabla invoice_products
+            // agregar el resultado de cada producto a la respuesta
+            $nuevaFacturaEncabezado['products'] = [];
+            // TERMINA CODIGO EXTRA
+
+            
             // construyo mi respuesta
-            $response = ["METHOD" => "POST", "SUCCESS" => true, "DATA" => $newRecord->fetch_assoc()];
+            $response = ["METHOD" => "POST", "SUCCESS" => true, "DATA" =>$nuevaFacturaEncabezado];
         } else {
             // no se creo existosamente
             $response = ["METHOD" => "POST", "SUCCESS" => false, "ERROR" => $conn->error];
