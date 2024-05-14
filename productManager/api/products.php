@@ -76,10 +76,19 @@ switch($method){
     case 'POST':
         // almaceno el valor del body de mi request en una variable
         $data = json_decode(file_get_contents('php://input'), true);
-        // obtener el valor del category_name
-        $name = $data['category_name'];
-        // construyo mi query SQL para crear la nueva categoria
-        $sql = "INSERT INTO $tableName (category_name) VALUES ('$name')";
+        // para almacenar columnas
+        $columns = [];
+        // para almacenar valores
+        $values = [];
+        foreach($tableColumns as $column){
+            $valueExists = isset($data[$column]);
+            if($valueExists){
+                $columns[] = $column;
+                $values[] = "'$data[$column]'";
+            }
+        }
+        // construyo mi query en base a las columnas y valores obtenidos
+        $sql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ");";
         // ejecuto el query y almaceno el resultado en una variable
         $createResult = $conn->query($sql);
         if($createResult === TRUE){
@@ -114,10 +123,10 @@ switch($method){
                 // verifico que el numero de filas afectadas sea 1
                 if($conn->affected_rows == 1){
                     // si es 1, regreso un mensaje de exito confirmando la eliminacion del registro
-                    $response = ["METHOD" => "DELETE", "SUCCESS" => true, "MESSAGE" => "Category deleted"];
+                    $response = ["METHOD" => "DELETE", "SUCCESS" => true, "MESSAGE" => "$tableName deleted"];
                 } else {
                     // si no es 1, regreso un mensaje de error diciendo que no se encontro la categoria
-                    $response = ["METHOD" => "DELETE", "SUCCESS" => false, "ERROR" => "Category not found"];
+                    $response = ["METHOD" => "DELETE", "SUCCESS" => false, "ERROR" => "$tableName not found"];
                 }
             } else {
                 // si hay un error en la ejecucion del query, regreso un error. 
