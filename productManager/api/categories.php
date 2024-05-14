@@ -13,8 +13,8 @@ $response = [];
 
 switch($method){
     case 'GET':
-        $id = $_GET['id'];
-        if(isset($id)){
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
             // GET SINGLE CATEGORY
             $sql = "SELECT * FROM categories WHERE id = $id";
             $result = $conn->query($sql);
@@ -33,22 +33,32 @@ switch($method){
         echo(json_encode($response));
         break;
     case 'PUT':
+        // obtengo el valor de los parametros id y category_name
         $id = $_GET['id'];
         $name = $_GET['category_name'];
+        // construyo el query SQL con los valores que he obtenido de mi URL.
         $sql = "UPDATE categories SET category_name = '$name' WHERE id = $id";
-
-        if ($conn->query($sql) === TRUE) {
-            if($conn->affected_rows > 0){
+        // ejecturo el query y lo almaceno en una variable
+        $queryResult = $conn->query($sql);
+        // si el query se ejecuta correctamente
+        if ($queryResult ===  TRUE) {
+            // pregunto si el numero de filas afectadas/actualizadas es mayor 0
+            if($conn->affected_rows == 1){
+                // si es mayor a cero
+                // construyo un query para obtener la fila actualizada
                 $updatedRecordQuery = "SELECT * FROM categories WHERE id = $id";
+                // ejecturo el query y lo almaceno en una varaible
                 $updatedRecord = $conn->query($updatedRecordQuery); 
+                // contruyo un array asociativo con la informacion.
                 $response = ["METHOD" => "PUT", "SUCCESS" => true, "DATA" => $updatedRecord->fetch_assoc()];
             } else {
+                // si no actualiza ninguna fila, es porque no encontro la categoria
                 $response = ["METHOD" => "PUT", "SUCCESS" => false, "ERROR" => "Category not found"];
             }
         } else {
+            // si el query no se ejecuta correctamente regreso un error.
             $response = ["METHOD" => "PUT", "SUCCESS" => false, "ERROR" => $conn->error];
         }
-    
         echo json_encode($response);
         break;
     case 'POST':
