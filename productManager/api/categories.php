@@ -87,8 +87,36 @@ switch($method){
         echo(json_encode($response));
         break;
     case 'DELETE':
-        $result = ["METHOD" => "DELETE", "SUCCESS" => true];
-        echo(json_encode($result));
+        if(isset($_GET['id'])){
+            // si el parametro id existe
+            // lo almaceno en una variable
+            $id = $_GET['id'];
+            // echo($id);
+            // contruyo el SQL para eliminar la categoria bajo el id obtenido a traves de los parametros
+            $sql = "DELETE FROM categories where id = $id;";
+            // ejecuto el query y almaceno la respuesta.
+            $result = $conn->query($sql);
+            // echo (json_encode($result));
+            // si el resultado es TRUE
+            if($result === TRUE){
+                // verifico que el numero de filas afectadas sea 1
+                if($conn->affected_rows == 1){
+                    // si es 1, regreso un mensaje de exito confirmando la eliminacion del registro
+                    $response = ["METHOD" => "DELETE", "SUCCESS" => true, "MESSAGE" => "Category deleted"];
+                } else {
+                    // si no es 1, regreso un mensaje de error diciendo que no se encontro la categoria
+                    $response = ["METHOD" => "DELETE", "SUCCESS" => false, "ERROR" => "Category not found"];
+                }
+            } else {
+                // si hay un error en la ejecucion del query, regreso un error. 
+                $response = ["METHOD" => "DELETE", "SUCCESS" => false, "ERROR" => $conn->error];
+            }
+        } else {
+            // si el parametro id no existe
+            // regreso un error 
+            $response = ["METHOD" => "DELETE", "SUCCESS" => false, "ERROR" => "THE PARAMETER ID IS REQURIED"];
+        }  
+        echo(json_encode($response));
         break;
     default: 
         $result = ["METHOD" => $method, "SUCCESS" => false, "ERROR" => "Method not supported"];
