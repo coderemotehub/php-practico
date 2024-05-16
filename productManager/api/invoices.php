@@ -52,17 +52,40 @@ switch($method){
         $sql = "UPDATE $tableName SET " . implode(", ", $values) . " WHERE id = $id";
         // ejecturo el query y lo almaceno en una variable
         $queryResult = $conn->query($sql);
+
         // si el query se ejecuta correctamente
-        if ($queryResult ===  TRUE) {
+        if ($queryResult) {
             // pregunto si el numero de filas afectadas/actualizadas es mayor 0
             if($conn->affected_rows == 1){
                 // si es mayor a cero
                 // construyo un query para obtener la fila actualizada
                 $updatedRecordQuery = "SELECT * FROM $tableName WHERE id = $id";
                 // ejecturo el query y lo almaceno en una varaible
-                $updatedRecord = $conn->query($updatedRecordQuery); 
+                $updatedRecord = $conn->query($updatedRecordQuery);
+                $updatedRecordResult = $updatedRecord->fetch_assoc();
+
+                // ----
+                $products = $data['products'];
+                if($products){
+                    foreach($products as $product){
+                        $productId = $product['product_id'];
+                        $quantity = $product['quantity'];
+                        $productInvoiceSQL = "UPDATE product_invoice SET quantity = ? WHERE product_id = ? AND invoice_id = ?";
+                        $stmt = $conn->prepare($productInvoiceSQL);
+                        $stmt->bind_param("iii", $quantity, $productId, $id);
+                        $stmt->execute();
+                    } 
+                    $updatedRecordResult['products'] = [];
+                    $getProductInvoiceSQL = "SELECT * FROM product_invoice WHERE invoice_id = $id";
+                    $productInvoiceResult = $conn->query($getProductInvoiceSQL);
+                    while ($product_invoice = $productInvoiceResult->fetch_assoc()){
+                        $updatedRecordResult['products'][] = $product_invoice;
+                    }                    
+                }
+                // ----
+
                 // contruyo un array asociativo con la informacion.
-                $response = ["METHOD" => "PUT", "SUCCESS" => true, "DATA" => $updatedRecord->fetch_assoc()];
+                $response = ["METHOD" => "PUT", "SUCCESS" => true, "DATA" => $updatedRecordResult ];
             } else {
                 // si no actualiza ninguna fila, es porque no encontro la categoria
                 $response = ["METHOD" => "PUT", "SUCCESS" => false, "ERROR" => "$tableName not found"];
@@ -121,6 +144,11 @@ switch($method){
                 $getProductInvoiceSQL = "SELECT * FROM product_invoice WHERE invoice_id = $newRecordId";
                 $productInvoiceResult = $conn->query($getProductInvoiceSQL);
                 while ($product_invoice = $productInvoiceResult->fetch_assoc()){
+                    $product_Id = $product_invoice['product_id'];
+                    $productSQL = "SELECT * FROM products WHERE id = $product_Id";
+                    $productResult = $conn->query($productSQL);
+                    $product = $productResult->fetch_assoc();
+                    $product_invoice['product'] = $product;
                     $nuevaFacturaEncabezado['products'][] = $product_invoice;
                 }
             }
