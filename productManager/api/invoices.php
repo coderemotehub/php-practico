@@ -91,6 +91,7 @@ switch($method){
         $sql = "INSERT INTO $tableName (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ");";
         // ejecuto el query y almaceno el resultado en una variable
         $createResult = $conn->query($sql);
+
         if($createResult === TRUE){
             // se creo exitosamente
             // obtengo el ID del nuevo registro (recien creado)
@@ -101,13 +102,28 @@ switch($method){
             $newRecord = $conn->query($getRecordQuery);
             $nuevaFacturaEncabezado = $newRecord->fetch_assoc();
             // CODIGO EXTRA
-            $invoiceProducts = $data['products'];
             //coinstruir un query por cada producto haciendo un loop foreach similar al de la linea 83, con los productos.
             // insertar esos productos en la tabla invoice_products
             // agregar el resultado de cada producto a la respuesta
-            $nuevaFacturaEncabezado['products'] = [];
-            // TERMINA CODIGO EXTRA
+            $invoiceProducts = $data['products'];
 
+            // TERMINA CODIGO EXTRA
+            $nuevaFacturaEncabezado['products'] = [];
+            if($invoiceProducts){
+                foreach($invoiceProducts as $product){
+                    $productId = $product['product_id'];
+                    $quantity = $product['quantity'];
+                    $productInvoiceSQL = "INSERT INTO product_invoice (product_id, invoice_id, quantity) VALUES ( ?, ?, ?);";
+                    $stmt = $conn->prepare($productInvoiceSQL);
+                    $stmt->bind_param("iii", $productId, $newRecordId, $quantity);
+                    $stmt->execute(); 
+                }
+                $getProductInvoiceSQL = "SELECT * FROM product_invoice WHERE invoice_id = $newRecordId";
+                $productInvoiceResult = $conn->query($getProductInvoiceSQL);
+                while ($product_invoice = $productInvoiceResult->fetch_assoc()){
+                    $nuevaFacturaEncabezado['products'][] = $product_invoice;
+                }
+            }
             
             // construyo mi respuesta
             $response = ["METHOD" => "POST", "SUCCESS" => true, "DATA" =>$nuevaFacturaEncabezado];
